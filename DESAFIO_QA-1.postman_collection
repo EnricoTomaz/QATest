@@ -1,0 +1,1173 @@
+{
+	"info": {
+		"_postman_id": "42547ddc-b822-483e-9709-1cd2ecfa852b",
+		"name": "DESAFIO QA - 1",
+		"description": "A campanha global de vacinação contra a Covid-19 começou, trazendo esperança de dias melhores para todos. Com isso, você e sua família decidiram iniciar um planejamento para a sua próxima viagem, que será realizada quando a situação normalizar. \n\nComo um exímio(a) conhecedor(a) das artes obscuras da programação, você decidiu construir uma API que auxilie no planejamento financeiro desta viagem. \n\nO objetivo principal desta API é permitir o cadastro das pessoas que participarão da viagem, estipular uma meta (valor a ser guardado) a ser alcançada por cada pessoa, além de registrar o dinheiro que cada um está guardando para a viagem ao longo do tempo.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "pessoas",
+			"item": [
+				{
+					"name": "Lista todas as pessoas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body has registros as an array\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.registros).to.be.an(\"array\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Response body has functional pagination\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    const tamanho = parseInt(pm.environment.get(\"tamanho\"))\r",
+									"    const pagina = parseInt(pm.environment.get(\"pagina\"))\r",
+									"    pm.expect(response.registros.length).to.be.lte(tamanho)\r",
+									"    pm.expect(response.pagina).to.be.equal(pagina)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body registros type checking\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.registros[0]._id).to.be.an(\"string\")\r",
+									"    pm.expect(response.registros[0].nome).to.be.an(\"string\")\r",
+									"    pm.expect(response.registros[0].dataNascimento).to.be.an(\"string\")\r",
+									"    pm.expect(response.registros[0].cpf).to.be.an(\"string\")\r",
+									"    pm.expect(response.registros[0].ativo).to.be.an(\"boolean\")\r",
+									"    pm.expect(response.registros[0].meta).to.be.an(\"number\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Cpf has 14 caracters\", function(){\r",
+									"  const response = pm.response.json();\r",
+									"  pm.expect(response.registros[0].cpf.length).to.be.equal(14)\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Response body type checking\",function(){\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.pagina).to.be.an(\"number\")\r",
+									"    pm.expect(response.tamanho).to.be.an(\"number\")\r",
+									"    pm.expect(response.numeroRegistros).to.be.an(\"number\")\r",
+									"})\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest({\r",
+									"    url: pm.environment.get(\"host\") + \"/api/pessoas\",\r",
+									"    method: \"POST\",\r",
+									"    header: {\r",
+									"        'content-type': 'application/json'\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: 'raw',\r",
+									"        raw: JSON.stringify({\r",
+									"        \"nome\": \"Marcelo Freitas Junior\",\r",
+									"        \"dataNascimento\": \"1994-06-07\",\r",
+									"        \"cpf\": \"05896196326\",\r",
+									"        \"ativo\": true,\r",
+									"        \"meta\": 1000.00 })\r",
+									"    }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {console.log(err)}\r",
+									"    else {\r",
+									"        pm.environment.set(\"idPessoa\", res.json()._id)\r",
+									"    }\r",
+									"    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/pessoas?pagina={{pagina}}&tamanho={{tamanho}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"pessoas"
+							],
+							"query": [
+								{
+									"key": "pagina",
+									"value": "{{pagina}}",
+									"description": "Um valor inteiro que representa a página da lista a ser retornada, começando em 0"
+								},
+								{
+									"key": "tamanho",
+									"value": "{{tamanho}}",
+									"description": "Um valor inteiro que representa o número de registros que será retornado na página"
+								}
+							]
+						},
+						"description": "Retorna uma lista com todas as pessoas (considerando uma paginação de registros) e suas informações.\nOs parâmetros `pagina` e `tamanho` são utilizados para controlar os registros que são retornados na requisição."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/pessoas?pagina=0&tamanho=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"pessoas"
+									],
+									"query": [
+										{
+											"key": "pagina",
+											"value": "0"
+										},
+										{
+											"key": "tamanho",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"pagina\": 0,\n    \"tamanho\": 10,\n    \"numeroRegistros\": 3,\n    \"registros\": [\n        {\n            \"id\": 1,\n            \"nome\": \"João da Silva\",\n            \"dataNascimento\": \"2000-01-01\",\n            \"cpf\": \"123.456.789/00\",\n            \"ativo\": true,\n            \"meta\": 1000\n        },\n        {\n            \"id\": 2,\n            \"nome\": \"Maria da Silva\",\n            \"dataNascimento\": \"1998-01-01\",\n            \"cpf\": \"987.654.321/00\",\n            \"ativo\": true,\n            \"meta\": 1000\n        },\n        {\n            \"id\": 3,\n            \"nome\": \"José da Silva\",\n            \"dataNascimento\": \"2010-09-27\",\n            \"cpf\": null,\n            \"ativo\": false,\n            \"meta\": 0.50\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Lista uma pessoa específica",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body is an json\", function(){\r",
+									"    const response = pm.response.json();\r",
+									"    if(pm.response.code === 200){\r",
+									"        //api retorna undefined quando a busca com o banco retorna uma array vazio\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            pm.expect(response).to.be.an(\"object\")\r",
+									"        }\r",
+									"    }\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Response body type cheking\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    if(pm.response.code === 200){\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            console.log(response)\r",
+									"            pm.expect(response._id).to.be.an(\"string\")\r",
+									"            pm.expect(response.nome).to.be.an(\"string\")\r",
+									"            pm.expect(response.dataNascimento).to.be.an(\"string\")\r",
+									"            pm.expect(response.cpf).to.be.an(\"string\")\r",
+									"            pm.expect(response.ativo).to.be.an(\"boolean\")\r",
+									"            pm.expect(response.meta).to.be.an(\"number\")\r",
+									"        }    \r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/pessoas/{{idPessoa}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"pessoas",
+								"{{idPessoa}}"
+							]
+						},
+						"description": "Retorna apenas as informações de uma pessoa."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/pessoas/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"pessoas",
+										"1"
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"nome\": \"João da Silva\",\n    \"dataNascimento\": \"01/01/2000\",\n    \"cpf\": \"464.589.520-66\",\n    \"ativo\": true,\n    \"meta\": 1000\n}"
+						},
+						{
+							"name": "Não encontrada",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/pessoas/27",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"pessoas",
+										"27"
+									]
+								}
+							},
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"codigoErro\": 1,\n    \"mensagemErro\": \"O registro 27 não foi encontrado\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Cadastra uma pessoa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body type cheking\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    if(pm.response.code === 200){\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            console.log(response)\r",
+									"            pm.expect(response._id).to.be.an(\"string\")\r",
+									"            pm.expect(response.nome).to.be.an(\"string\")\r",
+									"            pm.expect(response.dataNascimento).to.be.an(\"string\")\r",
+									"            pm.expect(response.cpf).to.be.an(\"string\")\r",
+									"            pm.expect(response.ativo).to.be.an(\"boolean\")\r",
+									"            pm.expect(response.meta).to.be.an(\"number\")\r",
+									"        }    \r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Marcelo Freitas Junior\",\n    \"dataNascimento\": \"1994-06-07\",\n    \"cpf\": \"05896196326\",\n    \"ativo\": true,\n    \"meta\": 1000.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/pessoas",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"pessoas"
+							]
+						},
+						"description": "Permite realizar o cadastro de uma nova pessoa. Os campos disponíveis para cadastro são:\n- `nome`: Uma string, obrigatória, de até 50 caracteres que armazena o nome da pessoa;\n- `dataNascimento`: Uma string, obrigatória, que armazena a data de nascimento da pessoa. A data de nascimento não pode ser maior que a data atual. O formato da data deve ser `YYYY-MM-DD`;\n- `cpf`: Uma string, não obrigatória, que armazena o CPF da pessoa (com a máscara do campo). Este campo pode ser vazio, mas se for informado os dígitos verificadores do CPF devem ser validados (https://dicasdeprogramacao.com.br/algoritmo-para-validar-cpf/);\n- `ativo`: Um booleano, obrigatório, que indica se a pessoa está ativa na viagem. O valor `true` indica que a pessoa irá participar da viagem e o valor `false` indica que a pessoa não irá participar da viagem;\n- `meta`: Um valor numérico, obrigatório, que indica a meta em Reais que a pessoa busca alcançar. Este valor deve ser maior que 0."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8080/api/pessoas",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"pessoas"
+									]
+								}
+							},
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"nome\": \"João da Silva\",\n    \"dataNascimento\": \"2000-01-01\",\n    \"cpf\": \"464.589.520-66\",\n    \"ativo\": true,\n    \"meta\": 1000.00\n}"
+						},
+						{
+							"name": "Erro negócio",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"nome\": \"João da Silva Santos\",\n    \"dataNascimento\": \"2000-01-01\",\n    \"cpf\": \"123.456.789/00\",\n    \"ativo\": true,\n    \"meta\": 1000.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/pessoas",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"pessoas"
+									]
+								}
+							},
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"codigoErro\": 2,\n    \"mensagemErro\": \"O cpf informado não é valido\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Edita uma pessoa",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body type cheking\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    if(pm.response.code === 200){\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            console.log(response)\r",
+									"            pm.expect(response._id).to.be.an(\"string\")\r",
+									"            pm.expect(response.nome).to.be.an(\"string\")\r",
+									"            pm.expect(response.dataNascimento).to.be.an(\"string\")\r",
+									"            pm.expect(response.cpf).to.be.an(\"string\")\r",
+									"            pm.expect(response.ativo).to.be.an(\"boolean\")\r",
+									"            pm.expect(response.meta).to.be.an(\"number\")\r",
+									"        }    \r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"João da Silva dos Santos\",\n    \"dataNascimento\": \"2000-01-01\",\n    \"cpf\": \"141.029.490-03\",\n    \"ativo\": false,\n    \"meta\":100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/pessoas/{{idPessoa}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"pessoas",
+								"{{idPessoa}}"
+							]
+						},
+						"description": "Permite editar as informações de uma pessoa. O registro deve respeitar as mesmas regras de negócio da API de cadastro de pessoa."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"nome\": \"João da Silva dos Santos\",\n    \"dataNascimento\": \"01/01/2000\",\n    \"cpf\": \"789.123.999/00\",\n    \"ativo\": false,\n    \"meta\": 0.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/pessoas/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"pessoas",
+										"1"
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": "",
+									"type": "text"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"nome\": \"João da Silva dos Santos\",\n    \"dataNascimento\": \"01/01/2000\",\n    \"cpf\": \"789.123.999/00\",\n    \"ativo\": false,\n    \"meta\": 0.00\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "receitas",
+			"item": [
+				{
+					"name": "Retorna uma lista de receitas",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Response body has functional pagination\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    const tamanho = parseInt(pm.environment.get(\"tamanho\"))\r",
+									"    const pagina = parseInt(pm.environment.get(\"pagina\"))\r",
+									"    pm.expect(response.registros.length).to.be.lte(tamanho)\r",
+									"    pm.expect(response.pagina).to.be.equal(pagina)\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body registros type checking\", function () {\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.registros[0]._id).to.be.an(\"string\")\r",
+									"    pm.expect(response.registros[0].pessoaId).to.be.an(\"string\")\r",
+									"    pm.expect(response.registros[0].valor).to.be.an(\"number\")\r",
+									"    pm.expect(response.registros[0].data).to.be.an(\"string\")\r",
+									"})\r",
+									"\r",
+									"\r",
+									"pm.test(\"Response body type checking\", function(){\r",
+									"    const response = pm.response.json();\r",
+									"    pm.expect(response.pagina).to.be.an(\"number\")\r",
+									"    pm.expect(response.tamanho).to.be.an(\"number\")\r",
+									"    pm.expect(response.numeroRegistros).to.be.an(\"number\")\r",
+									"    pm.expect(response.registros).to.be.an(\"array\")\r",
+									"})\r",
+									"\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest({\r",
+									"    url: pm.environment.get(\"host\") + \"/api/receitas\",\r",
+									"    method: \"POST\",\r",
+									"    header: {\r",
+									"        \"content-type\": \"application/json\",\r",
+									"        \"accept\": \"application/json\"\r",
+									"    },\r",
+									"    body: {\r",
+									"        mode: \"raw\",\r",
+									"        raw: JSON.stringify({\r",
+									"            \"pessoaId\":  pm.environment.get(\"idPessoa\"),\r",
+									"            \"data\": \"2021-02-12\",\r",
+									"            \"valor\": 2500.00\r",
+									"        })\r",
+									"        \r",
+									"    }\r",
+									"}, function (err, res) {\r",
+									"    if (err) {console.log(err)}\r",
+									"    else {\r",
+									"        pm.environment.set(\"idReceita\", res.json()._id)\r",
+									"        console.log(\"pessoa\")\r",
+									"        console.log(pm.environment.get(\"idPessoa\"))\r",
+									"        console.log(\"receita\")\r",
+									"        console.log(res.json())\r",
+									"        console.log(pm.environment.get(\"idReceita\"))\r",
+									"    }\r",
+									"    \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/receitas?pagina={{pagina}}&tamanho={{tamanho}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"receitas"
+							],
+							"query": [
+								{
+									"key": "pagina",
+									"value": "{{pagina}}",
+									"description": "Um valor inteiro que representa a página da lista a ser retornada, começando em 0"
+								},
+								{
+									"key": "tamanho",
+									"value": "{{tamanho}}",
+									"description": "Um valor inteiro que representa o número de registros que será retornado na página"
+								}
+							]
+						},
+						"description": "Retorna uma lista com todas as receitas (valor que cada pessoa guardou para a viagem) cadastradas.\nOs parâmetros `pagina` e `tamanho` são utilizados para controlar os registros que são retornados na requisição."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/receitas?pagina=0&tamanho=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas"
+									],
+									"query": [
+										{
+											"key": "pagina",
+											"value": "0"
+										},
+										{
+											"key": "tamanho",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"pagina\": 0,\n    \"tamanho\": 10,\n    \"numeroRegistros\": 2,\n    \"registros\": [\n        {\n            \"id\": 1,\n            \"pessoaId\": 1,\n            \"data\": \"2021-01-12\",\n            \"valor\": 1100.99\n        },\n        {\n            \"id\": 2,\n            \"pessoaId\": 1,\n            \"data\": \"2021-02-15\",\n            \"valor\": 2500\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Retorna uma receita específica",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body is an json\", function(){\r",
+									"    if(pm.response.code === 200){\r",
+									"        //api retorna undefined quando a busca com o banco retorna uma array vazio\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            const response = pm.response.json();\r",
+									"            pm.expect(response).to.be.an(\"object\")\r",
+									"        }\r",
+									"    }\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Response body type cheking\", function() {\r",
+									"    if(pm.response.code === 200){\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            const response = pm.response.json();\r",
+									"            pm.expect(response._id).to.be.an(\"string\")\r",
+									"            pm.expect(response.pessoaId).to.be.an(\"string\")\r",
+									"            pm.expect(response.data).to.be.an(\"string\")\r",
+									"            pm.expect(response.valor).to.be.an(\"number\")\r",
+									"        }    \r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/receitas/{{idReceita}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"receitas",
+								"{{idReceita}}"
+							]
+						},
+						"description": "Retorna as informações de uma receita específica."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/receitas/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas",
+										"1"
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"pessoaId\": 1,\n    \"data\": \"2021-01-12\",\n    \"valor\": 1100.99\n}"
+						},
+						{
+							"name": "Não encontrado",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/receitas/15",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas",
+										"15"
+									]
+								}
+							},
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"codigoErro\": 1,\n    \"mensagemErro\": \"O registro 15 não foi encontrado\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Cadastra uma receita",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body type cheking\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    if(pm.response.code === 200){\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            console.log(response)\r",
+									"            pm.expect(response._id).to.be.an(\"string\")\r",
+									"            pm.expect(response.nome).to.be.an(\"string\")\r",
+									"            pm.expect(response.dataNascimento).to.be.an(\"string\")\r",
+									"            pm.expect(response.cpf).to.be.an(\"string\")\r",
+									"            pm.expect(response.ativo).to.be.an(\"boolean\")\r",
+									"            pm.expect(response.meta).to.be.an(\"number\")\r",
+									"        }    \r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pessoaId\":  \"{{idPessoa}}\",\n    \"data\": \"2021-02-12\",\n    \"valor\": 2500.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/receitas",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"receitas"
+							]
+						},
+						"description": "Permite realizar o cadastro de uma nova receita. Os campos disponíveis para cadastro são:\n- `pessoaId`: Um número, obrigatório, que contém o ID da pessoa que está armazenando a receita. Não deve ser possível informar o ID de uma pessoa que não está cadastrada;\n- `data`: Uma string, obrigatória, que armazena a data em que a pessoa está guardando o dinheiro. A data de nascimento não pode ser maior que a data atual. O formato da data deve ser `YYYY-MM-DD`;\n- `valor`: Um número, obrigatório, que representa o montante de dinheiro que a pessoa está guardando. Este valor deve ser maior que 0."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pessoaId\": 1,\n    \"data\": \"2021-02-15\",\n    \"valor\": 2500.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/receitas",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas"
+									]
+								}
+							},
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"id\": 2,\n    \"pessoaId\": 1,\n    \"data\": \"2021-02-15\",\n    \"valor\": 2500\n}"
+						},
+						{
+							"name": "Erro de negócio",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pessoaId\": 1,\n    \"data\": \"2021-02-15\",\n    \"valor\": -270.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/receitas",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas"
+									]
+								}
+							},
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"codigoErro\": 3,\n    \"mensagemErro\": \"O campo valor não pode ser negativo\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Edita uma receita",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response body type cheking\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    if(pm.response.code === 200){\r",
+									"        if (typeof response !== 'undefined') {\r",
+									"            console.log(response)\r",
+									"            pm.expect(response._id).to.be.an(\"string\")\r",
+									"            pm.expect(response.pessoaId).to.be.an(\"string\")\r",
+									"            pm.expect(response.data).to.be.an(\"string\")\r",
+									"            pm.expect(response.valor).to.be.an(\"number\")\r",
+									"        }    \r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pessoaId\": \"{{idPessoa}}\",\n    \"data\": \"2021-02-15\",\n    \"valor\": 200.50\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/receitas/{{idReceita}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"receitas",
+								"{{idReceita}}"
+							]
+						},
+						"description": "Permite editar as informações de uma receita. O registro deve respeitar as mesmas regras de negócio da API de cadastro de receita."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pessoaId\": 1,\n    \"data\": \"2021-02-15\",\n    \"valor\": 2500.50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/receitas/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas",
+										"1"
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"pessoaId\": 1,\n    \"data\": \"2021-02-15\",\n    \"valor\": 2537.50\n}"
+						},
+						{
+							"name": "Não encontrado",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pessoaId\": 1,\n    \"data\": \"2021-02-15\",\n    \"valor\": 2500.50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/receitas/15",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas",
+										"15"
+									]
+								}
+							},
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"codigoErro\": 1,\n    \"mensagemErro\": \"O registro 15 não foi encontrado\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Deleta uma receita",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/receitas/{{idReceita}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"receitas",
+								"{{idReceita}}"
+							]
+						},
+						"description": "Permite deletar uma receita."
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/receitas/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas",
+										"1"
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "Text",
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"name": "Não encontrado",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/receitas/15",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"receitas",
+										"15"
+									]
+								}
+							},
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "{\n    \"codigoErro\": 1,\n    \"mensagemErro\": \"O registro 15 não foi encontrado\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "totalizadores",
+			"item": [
+				{
+					"name": "Retorna os totalizadores",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/totalizadores",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"totalizadores"
+							]
+						},
+						"description": "Calcula o valor total que foi guardado pelas pessoas ativas na viagem. Por exemplo:\n- Se João está ativo na viagem e fez dois depósitos de R$ 100.00;\n- E se Maria não está ativa na viagem e fez um depósito de R$ 50.00;\n- Então esta API deve retornar o valor 200 (a soma dos dois depósitos de João)"
+					},
+					"response": [
+						{
+							"name": "Sucesso",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/totalizadores",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"totalizadores"
+									]
+								}
+							},
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": null,
+							"cookie": [],
+							"body": "2500.25"
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
